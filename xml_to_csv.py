@@ -32,16 +32,17 @@ def xml_to_csv(path):
         tree = ET.parse(xml_file)
         root = tree.getroot()
         for member in root.findall("object"):
+            print(member[0].text)
             classes_names.append(member[0].text)
             value = (
                 root.find("filename").text,
                 int(root.find("size")[0].text),
                 int(root.find("size")[1].text),
                 member[0].text,
-                int(member[2][0].text),
-                int(member[2][1].text),
-                int(member[2][2].text),
-                int(member[2][3].text),
+                int(float(member.find("bndbox")[0].text)),
+                int(float(member.find("bndbox")[1].text)),
+                int(float(member.find("bndbox")[2].text)),
+                int(float(member.find("bndbox")[3].text)),
             )
             xml_list.append(value)
     column_name = [
@@ -93,6 +94,7 @@ def main():
     assert os.path.isdir(args.inputDir)
     os.makedirs(os.path.dirname(args.outputFile), exist_ok=True)
     xml_df, classes_names = xml_to_csv(args.inputDir)
+    print(classes_names)
     xml_df.to_csv(args.outputFile, index=None)
     print("Successfully converted xml to csv.")
     if args.labelMapDir:
